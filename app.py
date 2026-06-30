@@ -292,19 +292,19 @@ if st.button("🚀 Identify Disease", type="primary", disabled=(image_bytes is N
             top_score = 0
 
             for i, result in enumerate(results["results"][:5]):
-                species_name = result.get("species", {}).get("scientificNameWithoutAuthor", "Unknown")
-                common_names = result.get("species", {}).get("commonNames", [])
-                common_name = common_names[0] if common_names else "N/A"
+                # Diseases endpoint uses "name" (EPPO code) and "label" (common name)
+                disease_name = result.get("name", "Unknown")
+                disease_label = result.get("label", "N/A")
                 score = result.get("score", 0)
 
                 if i == 0:
-                    top_disease = f"{species_name} - {common_name}"
+                    top_disease = f"{disease_name} - {disease_label}"
                     top_score = score
 
                 # Display with progress bar
                 col1, col2 = st.columns([3, 1])
                 with col1:
-                    st.markdown(f"**{species_name}** — {common_name}")
+                    st.markdown(f"**{disease_name}** — {disease_label}")
                 with col2:
                     st.markdown(f"**{score*100:.1f}%**")
                 st.progress(score)
@@ -341,8 +341,8 @@ if st.button("🚀 Identify Disease", type="primary", disabled=(image_bytes is N
                 "all_results_json": json.dumps(
                     [
                         {
-                            "species": r.get("species", {}).get("scientificNameWithoutAuthor", ""),
-                            "common_name": (r.get("species", {}).get("commonNames", [""])[0] if r.get("species", {}).get("commonNames") else ""),
+                            "name": r.get("name", ""),
+                            "label": r.get("label", ""),
                             "score": round(r.get("score", 0), 4),
                         }
                         for r in results["results"][:5]
