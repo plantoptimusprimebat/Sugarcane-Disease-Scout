@@ -290,24 +290,39 @@ if st.button("🚀 Identify Disease", type="primary", disabled=(image_bytes is N
 
             top_disease = None
             top_score = 0
-
+st.json(results)  # TEMPORARY - remove after debugging
             for i, result in enumerate(results["results"][:5]):
-                # Diseases endpoint uses "name" (EPPO code) and "label" (common name)
-                disease_name = result.get("name", "Unknown")
-                disease_label = result.get("label", "N/A")
-                score = result.get("score", 0)
-
-                if i == 0:
-                    top_disease = f"{disease_name} - {disease_label}"
-                    top_score = score
-
-                # Display with progress bar
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    st.markdown(f"**{disease_name}** — {disease_label}")
-                with col2:
-                    st.markdown(f"**{score*100:.1f}%**")
-                st.progress(score)
+            # Try multiple response structures
+            score = result.get("score", 0)
+    
+            # Structure 1: disease object with nested fields
+            disease_obj = result.get("disease", {})
+    
+            # Structure 2: flat fields at result level
+            disease_name = (
+                disease_obj.get("scientificName")
+                or disease_obj.get("name")
+                or result.get("name")
+                or "Unknown"
+            )
+             disease_label = (
+                disease_obj.get("label")
+                or (disease_obj.get("commonNames", [None])[0] if disease_obj.get("commonNames") else None)
+                or result.get("label")
+                or "N/A"
+            )
+    
+            if i == 0:
+            top_disease = f"{disease_name} - {disease_label}"
+            top_score = score
+    
+            # Display with progress bar
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.markdown(f"**{disease_name}** - {disease_label}")
+            with col2:
+                st.markdown(f"**{score*100:.1f}%**")
+            st.progress(score)
 
             # Fetch weather data
             weather = None
