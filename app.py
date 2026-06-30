@@ -290,7 +290,7 @@ if st.button("🚀 Identify Disease", type="primary", disabled=(image_bytes is N
 
             top_disease = None
             top_score = 0
-            st.json(results)  # TEMPORARY - remove after debugging
+            
             for i, result in enumerate(results["results"][:5]):
                 score = result.get("score", 0)
                 eppo_code = result.get("name", "Unknown")
